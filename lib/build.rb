@@ -25,6 +25,7 @@ module GitlabCi
       @before_sha = data[:before_sha]
       @timeout = data[:timeout] || TIMEOUT
       @allow_git_fetch = data[:allow_git_fetch]
+      @variables = data[:variables]
     end
 
     def run
@@ -146,6 +147,20 @@ module GitlabCi
 
       @process.environment['CI_PROJECT_ID'] = @project_id
       @process.environment['CI_PROJECT_DIR'] = project_dir
+      if @variables
+        @variables.each do |v|
+          # @variables is like [{"key"=>"CI", "value"=>"true", "public"=>true}, 
+          # {"key"=>"GITLAB_CI", "value"=>"true", "public"=>true} , ... 
+          # {"key" => "UPLOAD_TO_S3", "value"=>"true", "public"=>false}]
+          #
+          # guess the public attr the public or custom attribute
+          # only set user custom vars 
+          #
+          unless v["public"]
+            @process.environment[v["key"]] = v["value"]
+          end
+        end
+      end
 
       @process.start
 

@@ -36,7 +36,8 @@ module GitlabCi
           ref_name: response['ref'],
           before_sha: response['before_sha'],
           allow_git_fetch: response['allow_git_fetch'],
-          timeout: response['timeout']
+          timeout: response['timeout'],
+          variables: response['variables']
         }
       elsif response.code == 403
         puts 'forbidden'
